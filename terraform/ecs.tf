@@ -69,7 +69,9 @@ resource "aws_ecs_task_definition" "app_task" {
 
   container_definitions = jsonencode([{
     name      = "app-container"
-    image     = "nginx:latest"
+    image     =  "133856114059.dkr.ecr.us-east-1.amazonaws.com/nginx:latest"
+
+
     essential = true
     portMappings = [{
       containerPort = 80
@@ -90,6 +92,12 @@ resource "aws_ecs_service" "app_service" {
     subnets          = var.subnet_ids
     assign_public_ip = true
     security_groups  = [aws_security_group.ecs_alternate_sg.id]
+  }
+
+ load_balancer {
+    target_group_arn = aws_lb_target_group.app_tg.arn
+    container_name   = "app-container"
+    container_port   = 80
   }
 
   depends_on = [
